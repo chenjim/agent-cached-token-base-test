@@ -1,0 +1,3 @@
+project,model,task,api_calls,input,output,cache_read,note
+werkzeug,mimo-v2.6-flash,title_generation,1,249,14,128,不属于被测推理链路
+pytest,mimo-v2.6-flash,title_generation,1,245,11,192,不属于被测推理链路
