@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
-# 用法: PROMPT='...' ./run/run_task.sh <opencode|pi|hermes> <werkzeug|pytest>
+# 用法: ./run/run_task.sh <opencode|pi|hermes> <werkzeug|pytest>
 set -euo pipefail
 source "$(dirname "$0")/common.sh"
 
 CLIENT=${1:?client: opencode|pi|hermes}
 PROJECT=${2:?project: werkzeug|pytest}
-PROMPT=${PROMPT:?set PROMPT}
+
+case "$PROJECT" in
+  werkzeug) TEST_CMD="PYTHONPATH=\$PWD/src $ROOT/.venv/bin/python -m pytest tests/test_http.py tests/test_wrappers.py -q" ;;
+  pytest)   TEST_CMD="PYTHONPATH=\$PWD/src $ROOT/.venv/bin/python -m pytest testing/test_junitxml.py -q" ;;
+  *) echo "unknown project: $PROJECT" >&2; exit 1 ;;
+esac
+
+PROMPT=$(awk '/^## Prompt$/{f=1;next} f&&/^```/{n++;next} f&&n==1{print}' \
+         "$ROOT/tasks/$PROJECT-task.md")
 
 WORKDIR=$(prepare_workdir "$CLIENT" "$PROJECT")
-echo "workdir: $WORKDIR"
+START=$(date +%s)
+echo "client=$CLIENT project=$PROJECT start=$START workdir=$WORKDIR"
 cd "$WORKDIR"
 
 case "$CLIENT" in
@@ -24,8 +33,10 @@ case "$CLIENT" in
     hermes chat -Q --oneshot --yolo --provider opencode-go --model "$MODEL_ID" \
       --reasoning "$LEVEL" --in "$WORKDIR" -q "$PROMPT"
     ;;
-  *) echo "unknown client: $CLIENT" >&2; exit 1 ;;
 esac
 
+echo "--- 验收 ---"
+eval "$TEST_CMD" 2>&1 | tail -8
 echo "--- diff stat ---"
-git -C "$WORKDIR" diff --stat | tail -5 || true
+git -C "$WORKDIR" diff HEAD --stat | tail -10
+echo "END start=$START end=$(date +%s) client=$CLIENT project=$PROJECT"

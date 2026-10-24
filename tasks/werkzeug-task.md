@@ -1,23 +1,35 @@
-# Werkzeug 任务模板
+# Werkzeug 任务：discard invalid ETag values
 
-## 仓库
-`projects/base/werkzeug`
+- 来源 PR：pallets/werkzeug #3234
+- Base commit：`efa80bff0ac50824ea4f7d848a10001cc614c893`
+- 测试 patch：`tasks/patches/werkzeug-tests.patch`（只改 tests/）
+- 目标测试：`tests/test_http.py`、`tests/test_wrappers.py`
+- 初始状态：2 failed / 213 passed
 
-## 待填 issue
-- Issue URL：
-- Issue 标题：
-- Issue 描述：
-- Failing test：`tests/...py::test_...`
-- Base commit：
+## 运行命令
+```bash
+cd work/<client>-werkzeug
+PYTHONPATH=$PWD/src /vol1/1000/Project/agent-cached-token-base-test/.venv/bin/python -m pytest tests/test_http.py tests/test_wrappers.py -q
+```
 
 ## 验收
-- `pytest tests/<file>.py -q` 全绿
-- 不修改 tests/
-- `git diff --stat` 记录修改文件数/行数
+- 上述命令全绿
+- `tests/` 未被修改
+- 记录 `git diff --stat` 的源文件改动
 
-## 统一 Prompt 模板
-Repository: pallets/werkzeug.
-Issue: <粘贴 issue 标题与描述>.
-There is a failing test in tests/<path>.py::test_xxx.
-Fix the bug without editing tests. Run the specific test and stop when it passes.
-Explain root cause briefly.
+## Prompt
+```
+Repository: pallets/werkzeug (checked out at the buggy commit).
+
+Bug: invalid ETag values must be discarded instead of being accepted and kept
+in the parsed ETag structures.
+
+Run the tests with:
+  PYTHONPATH=$PWD/src /vol1/1000/Project/agent-cached-token-base-test/.venv/bin/python -m pytest tests/test_http.py tests/test_wrappers.py -q
+
+Two tests currently fail. Fix the library source under src/werkzeug/ so all
+tests in these two files pass.
+
+Do not modify anything under tests/ or pyproject.toml. Stop as soon as the
+tests pass. Briefly explain the root cause at the end.
+```
