@@ -1,0 +1,89 @@
+diff --git a/src/_pytest/junitxml.py b/src/_pytest/junitxml.py
+index 06bb9fd..2b572eb 100644
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -43,6 +43,10 @@ _JunitLogging = Literal["no", "log", "system-out", "system-err", "out-err", "all
+ _JunitDurationReport = Literal["total", "call"]
+ _JunitFamily = Literal["legacy", "xunit1", "xunit2"]
+ 
++# Appended to a shortened ``message`` attribute to point at the element text,
++# which always holds the full report.
++_FULL_REPORT = "full report in element text"
++
+ 
+ def bin_xml_escape(arg: object) -> str:
+     r"""Visually escape invalid XML characters.
+@@ -69,6 +73,53 @@ def bin_xml_escape(arg: object) -> str:
+     return re.sub(illegal_xml_re, repl, str(arg))
+ 
+ 
++def shorten_message(message: str, budget: int = 500) -> str:
++    """Shorten *message* to roughly *budget* characters.
++
++    The ``message`` attribute of ``<failure>`` and ``<error>`` elements is not
++    meant to carry the full report (that is the element text): very long
++    messages, such as a diff produced by ``-vv``, can produce attributes of
++    tens of thousands of characters which some XML parsers reject.
++
++    The message is truncated on line boundaries, so the result never ends in
++    the middle of a line unless a single line alone exceeds the budget. A
++    notice pointing at the element text is appended when anything was cut.
++    Shortening happens on the raw text, before XML escaping, so escapes are
++    never split.
++    """
++    if len(message) <= budget:
++        return message
++
++    lines = message.splitlines()
++    kept_lines: list[str] = []
++    used = 0
++    for line in lines:
++        # +1 for the newline separating this line from the previous ones.
++        extra = len(line) + (1 if kept_lines else 0)
++        if used + extra > budget:
++            break
++        kept_lines.append(line)
++        used += extra
++
++    if kept_lines:
++        removed = len(lines) - len(kept_lines)
++        if removed <= 0:
++            # Only the raw text was too long (e.g. \r\n line endings).
++            return "\n".join(kept_lines)
++        return (
++            "\n".join(kept_lines)
++            + f"\n[+{removed} more line{'' if removed == 1 else 's'}; {_FULL_REPORT}]"
++        )
++
++    # The first line alone exceeds the budget: cut it hard.
++    removed = len(lines) - 1
++    if removed <= 0:
++        notice = f"[truncated; {_FULL_REPORT}]"
++    else:
++        notice = f"[+{removed} more line{'' if removed == 1 else 's'}; {_FULL_REPORT}]"
++    return f"{lines[0][:budget]}...\n{notice}"
++
++
+ def merge_family(left, right) -> None:
+     result = {}
+     for kl, vl in left.items():
+@@ -213,7 +264,7 @@ class _NodeReporter:
+                 message = reprcrash.message
+             else:
+                 message = str(report.longrepr)
+-            message = bin_xml_escape(message)
++            message = bin_xml_escape(shorten_message(message))
+             self._add_simple("failure", message, str(report.longrepr))
+ 
+     def append_collect_error(self, report: CollectReport) -> None:
+@@ -236,7 +287,9 @@ class _NodeReporter:
+             msg = f'failed on teardown with "{reason}"'
+         else:
+             msg = f'failed on setup with "{reason}"'
+-        self._add_simple("error", bin_xml_escape(msg), str(report.longrepr))
++        self._add_simple(
++            "error", bin_xml_escape(shorten_message(msg)), str(report.longrepr)
++        )
+ 
+     def append_skipped(self, report: TestReport) -> None:
+         if hasattr(report, "wasxfail"):

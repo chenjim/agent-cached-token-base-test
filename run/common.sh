@@ -20,7 +20,7 @@ declare -A BASE_COMMIT=(
 prepare_workdir() {
   local name=$1 project=$2
   local src="$ROOT/projects/base/$project"
-  local dst="$ROOT/work/$name-$project"
+  local dst="$ROOT/work/${ROUND:+r$ROUND-}$name-$project"
   local commit="${BASE_COMMIT[$project]:-}"
   local patch="$ROOT/tasks/patches/$project-tests.patch"
 

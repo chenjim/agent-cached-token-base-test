@@ -17,7 +17,7 @@ PROMPT=$(awk '/^## Prompt$/{f=1;next} f&&/^```/{n++;next} f&&n==1{print}' \
 
 WORKDIR=$(prepare_workdir "$CLIENT" "$PROJECT")
 START=$(date +%s)
-echo "client=$CLIENT project=$PROJECT start=$START workdir=$WORKDIR"
+echo "client=$CLIENT project=$PROJECT round=${ROUND:-1} start=$START workdir=$WORKDIR"
 cd "$WORKDIR"
 
 case "$CLIENT" in
@@ -36,7 +36,7 @@ case "$CLIENT" in
 esac
 
 echo "--- 验收 ---"
-EV="$ROOT/results/evidence/$CLIENT-$PROJECT"
+EV="$ROOT/results/evidence/${ROUND:+r$ROUND-}$CLIENT-$PROJECT"
 mkdir -p "$EV"
 eval "$TEST_CMD" 2>&1 | tee "$EV/pytest.txt" | tail -8
 git -C "$WORKDIR" diff HEAD > "$EV/diff.patch"
@@ -44,4 +44,10 @@ git -C "$WORKDIR" status --porcelain > "$EV/git-status.txt"
 echo "--- diff stat ---"
 git -C "$WORKDIR" diff HEAD --stat | tail -10
 echo "evidence: $EV"
+echo "round=${ROUND:-1}" > "$EV/meta.txt"
+echo "start=$START" >> "$EV/meta.txt"
+echo "end=$(date +%s)" >> "$EV/meta.txt"
+echo "client=$CLIENT" >> "$EV/meta.txt"
+echo "project=$PROJECT" >> "$EV/meta.txt"
+echo "workdir=$WORKDIR" >> "$EV/meta.txt"
 echo "END start=$START end=$(date +%s) client=$CLIENT project=$PROJECT"

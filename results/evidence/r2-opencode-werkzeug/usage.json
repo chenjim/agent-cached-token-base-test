@@ -1,0 +1,21 @@
+{
+  "id": "ses_e932c336dffemaeqiy6a1xSsOC",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash",
+  "variant": "max",
+  "cost": 0.013508076,
+  "tokens": {
+    "input": 60662,
+    "output": 4301,
+    "reasoning": 1726,
+    "cache": {
+      "read": 264192,
+      "write": 0
+    }
+  },
+  "time": {
+    "created": 1792827182440,
+    "updated": 1792827252619,
+    "idle": 1792827252621
+  }
+}
