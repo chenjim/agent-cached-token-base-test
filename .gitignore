@@ -1,0 +1,15 @@
+# 第三方仓库基线（体积大，按 README 复现）
+projects/base/
+
+# 运行时工作副本
+work/
+
+# 运行产物
+results/pi-sessions/
+results/*.txt
+baseline/workdir/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
