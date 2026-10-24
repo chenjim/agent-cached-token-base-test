@@ -111,4 +111,23 @@ fig.suptitle("三轮之间最大差 2.5 倍，单轮数据不能下结论",fonts
 fig.tight_layout(rect=(0,0.07,1,1))
 fig.savefig(f"{OUT}/04-variance.png",bbox_inches="tight")
 plt.close(fig)
+# 图5：hi 空任务固定开销
+base={"opencode":(6148,10240),"pi":(14534,1280),"hermes":(21532,2816)}
+fig,ax=plt.subplots(figsize=(8.4,3.6))
+y=np.arange(len(CL))[::-1]
+inp=[base[c][0] for c in CL]; cr=[base[c][1] for c in CL]
+ax.barh(y,inp,color=[C[c] for c in CL],height=0.5,label="input（未命中缓存）")
+ax.barh(y,cr,left=inp,color=[C[c] for c in CL],alpha=0.35,height=0.5,label="cache_read（命中缓存）")
+for yi,i_,c_,c in zip(y,inp,cr,CL):
+    ax.text(i_/2,yi,f"{i_}",ha="center",va="center",fontsize=9,color="white",fontweight="bold")
+    ax.text(i_+c_+700,yi,f"合计 {i_+c_}",va="center",fontsize=9)
+ax.set_yticks(y); ax.set_yticklabels(CL)
+ax.set_xlabel("prompt token（仅输入一个 hi）")
+ax.set_xlim(0,30500)
+ax.set_title("空任务固定开销：input 差 3.5 倍，这就是三端 system prompt 的体量差",fontsize=11)
+ax.legend(frameon=False,loc="upper center",bbox_to_anchor=(0.5,-0.22),ncol=2,fontsize=9)
+ax.grid(axis="x",alpha=.25); ax.set_axisbelow(True)
+fig.tight_layout()
+fig.savefig(f"{OUT}/05-hi-baseline.png",bbox_inches="tight")
+plt.close(fig)
 print("done")

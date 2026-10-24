@@ -1,0 +1,14 @@
+{
+  "client": "pi",
+  "scenario": "hi",
+  "session_file": "2026-10-24T12-10-55-078Z_01a16dd2-34e5-7747-b577-6d96e705fdd1.jsonl",
+  "totals": {
+    "api_calls": 1,
+    "input": 14534,
+    "output": 157,
+    "reasoning": 130,
+    "cache_read": 1280,
+    "cache_write": 0,
+    "cost": 0.00227814
+  }
+}

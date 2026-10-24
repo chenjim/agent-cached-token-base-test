@@ -1,4 +1,8 @@
-# 同一模型，三个 Agent，谁在偷偷烧 token？
+# 同一任务，同一模型，PI/OPENCODE/HERMES，谁烧 token更多？
+
+[TOC]
+
+> 本文首发地址 <https://h89.cn/archives/836.html>
 
 我每天在 opencode、Hermes、pi 之间切来切去。三个都跑 `opencode-go/deepseek-v4.1-flash`，
 都开着 `reasoning=max`，干的是同一类活：读代码、改 bug、跑测试。
@@ -38,6 +42,28 @@ pi --provider opencode-go --model "opencode-go/deepseek-v4.1-flash:max" -p
 hermes chat -Q --oneshot --yolo --provider opencode-go \
   --model deepseek-v4.1-flash --reasoning max
 ```
+
+## 先量一下空转成本
+
+在跑真实任务之前，我先让三端各回一个 `hi`。这不是废话测试——它能量出客户端自身的固定开销：
+system prompt、工具 schema、记忆和技能注入，全在这一次请求里。
+
+![空任务固定开销](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-05-hi-baseline.png-blog)
+
+| 客户端 | input | cache_read | prompt 合计 | 总 token | 成本 |
+|---|---:|---:|---:|---:|---:|
+| opencode | 6148 | 10240 | 16388 | 16489 | $0.001014 |
+| pi | 14534 | 1280 | 15814 | 16101 | $0.002356 |
+| Hermes | 21532 | 2816 | 24348 | 25101 | $0.003690 |
+
+**input 差 3.5 倍**（6148 / 14534 / 21532）——这就是三端 system prompt 的体量差。
+Hermes 把规则、记忆、技能清单都塞进去；pi 带完整工具定义；opencode 最精简。
+
+这里也能看出缓存的一个特性：opencode 命中 62%，pi 只有 8%，Hermes 11%。
+不是谁更"会缓存"，是 opencode 的 system prompt 跟历史会话前缀重合度高。
+
+但注意，空任务成本只占实际任务的 8%–19%（opencode $0.0010 vs 任务 $0.0129，pi 占到 18.6%）。
+**三端的总量差异主要来自多轮上下文累积，不是开场那一下。**
 
 ## 任务：两个真实 bug，不是玩具题
 
@@ -209,6 +235,3 @@ cd agent-cached-token-base-test
 # 具体命令见 AGENTS.md
 ```
 
----
-
-*测试环境：飞牛 NAS（i5-1240P，无 GPU），2026-10-24。模型全走云端，本地只负责调度和跑测试。*

@@ -1,0 +1,29 @@
+{
+  "client": "hermes",
+  "scenario": "hi",
+  "session": "local-6b1b5e255706a66625d0d3872bf07bb2e5d86ae52ee22bd24aebe3ca1a9b01f6",
+  "models": [
+    {
+      "model": "mimo-v2.6-flash",
+      "task": "title_generation",
+      "api_calls": 1,
+      "input": 235,
+      "output": 8,
+      "reasoning": 0,
+      "cache_read": 0,
+      "cache_write": 0,
+      "actual_cost": 0.0
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "task": "",
+      "api_calls": 1,
+      "input": 21532,
+      "output": 380,
+      "reasoning": 373,
+      "cache_read": 2816,
+      "cache_write": 0,
+      "actual_cost": 0.0
+    }
+  ]
+}

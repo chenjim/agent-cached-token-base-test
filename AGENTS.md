@@ -14,8 +14,9 @@ tasks/<project>-task.md           任务定义：PR、base commit、目标测试
 tasks/patches/<project>-tests.patch  仅含 tests 的 patch，让测试先失败
 run/common.sh                     模型/档位变量、BASE_COMMIT 映射、prepare_workdir
 run/run_task.sh                   单次任务运行（client × project）
-run/run_hi_baseline.sh            hi 基准
+run/run_hi_baseline.sh            hi 空任务基准（量化固定开销）
 collect/collect.py                usage 采集 + 成本估算
+results/baseline-hi.csv           hi 空任务固定开销
 results/tasks.csv                 r1 汇总
 results/tasks-r2.csv              r2 汇总
 results/summary-2rounds.csv       两轮均值
@@ -52,6 +53,12 @@ ROUND=2 ./run/run_task.sh hermes werkzeug
 # 改推理档
 LEVEL=max ./run/run_task.sh pi pytest
 ```
+
+## 两套基准
+1. **hi 空任务**：只发一个 `hi`，量化客户端固定开销（system prompt / 工具 schema / 记忆注入）。
+   解读时注意 `cache_read` 来自 provider 前缀复用，不是稳态命中率。
+2. **真实任务**：werkzeug / pytest 的 PR 修复，测多轮上下文累积下的 token 与成本。
+   实际任务成本里，固定开销只占 8%–19%。
 
 ## 关键不变量
 1. **模型与档位必须三端一致**：`opencode-go/deepseek-v4.1-flash`，默认 `LEVEL=max`。

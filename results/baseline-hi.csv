@@ -1,4 +1,4 @@
-client,model,reasoning_level,api_calls,input,output,reasoning,cache_read,cache_write,prompt_tokens,cache_hit_rate,cost_usd,notes
-opencode,opencode-go/deepseek-v4.1-flash,max,1,3361,82,105,27904,0,31265,89.25,0.000677712,"hi baseline; session exported"
-pi,opencode-go/deepseek-v4.1-flash,max,1,14095,22,0,0,0,14095,0.00,0.00212745,"hi baseline"
-hermes,opencode-go/deepseek-v4.1-flash,max,1,21876,166,118,0,0,21876,0.00,0.00345180,"hi baseline; aux mimo-v2.6-flash 43/8 not included"
+client,model,reasoning_level,api_calls,input,output,reasoning,cache_read,cache_write,prompt_tokens,cache_hit_rate,total_tokens,cost_reported,estimated_cost,notes
+opencode,opencode-go/deepseek-v4.1-flash,max,1,6148,63,38,10240,0,16388,62.48,16489,0.000991170,0.001013520,"hi 空任务固定开销"
+pi,opencode-go/deepseek-v4.1-flash,max,1,14534,157,130,1280,0,15814,8.09,16101,0.002278140,0.002356140,"hi 空任务固定开销"
+hermes,opencode-go/deepseek-v4.1-flash,max,1,21532,380,373,2816,0,24348,11.57,25101,,0.003690048,"hi 空任务固定开销；mimo-v2.6-flash title_generation 235/8 未计入"
