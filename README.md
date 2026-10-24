@@ -48,7 +48,7 @@ hermes chat -Q --oneshot --yolo --provider opencode-go \
 在跑真实任务之前，我先让三端各回一个 `hi`。这不是废话测试——它能量出客户端自身的固定开销：
 system prompt、工具 schema、记忆和技能注入，全在这一次请求里。
 
-![空任务固定开销](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-05-hi-baseline.png-blog)
+![空任务固定开销](docs/figures/05-hi-baseline.png)
 
 | 客户端 | input | cache_read | prompt 合计 | 总 token | 成本 |
 |---|---:|---:|---:|---:|---:|
@@ -114,7 +114,7 @@ Hermes 会绕去 `datastructures/range.py`。同一个 bug，多种合法解法�
 
 三轮，每轮 6 次运行，共 18 次，全部通过目标测试，没有人动过测试文件。
 
-![三轮平均总 token](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-01-tokens.png-blog)
+![三轮平均总 token](docs/figures/01-tokens.png)
 
 | 项目 | 客户端 | 第 1 轮 | 第 2 轮 | 第 3 轮 | 中位数 | 成本/次（均值） | 命中率（均值） |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -141,7 +141,7 @@ Hermes 本地不记成本（`actual_cost_usd` 恒为 0），表里是按 opencod
 
 ## 缓存命中：真的差不多
 
-![缓存命中率](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-02-cache-hit.png-blog)
+![缓存命中率](docs/figures/02-cache-hit.png)
 
 三轮均值都在 89%–93% 之间，三个客户端的差距**小于各自的波动范围**——
 换句话说：缓存命中率不是这三者的差异来源，谁也没比别人省。
@@ -153,7 +153,7 @@ opencode 波动最大（81%–95%），跟会话重建时机有关，还没深�
 
 ## 成本差距才是重点
 
-![单次成本](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-03-cost.png-blog)
+![单次成本](docs/figures/03-cost.png)
 
 三轮均值看，Hermes 在 werkzeug 上是 opencode 的 2.4 倍、pytest 上 2.0 倍。
 原因三个叠加：
@@ -170,7 +170,7 @@ pi 则意外地稳：总 token 和 opencode 接近，成本还低一截。
 
 ## 但先别急着下结论
 
-![三轮方差](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-04-variance.png-blog)
+![三轮方差](docs/figures/04-variance.png)
 
 这是我最想强调的一张图：**同一配置、同一个任务，三轮之间最大差 2.5 倍。**
 
