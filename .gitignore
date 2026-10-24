@@ -5,7 +5,6 @@ projects/base/
 work/
 
 # 运行产物
-results/pi-sessions/
 results/*.txt
 baseline/workdir/
 

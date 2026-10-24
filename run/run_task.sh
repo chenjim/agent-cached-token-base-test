@@ -36,7 +36,12 @@ case "$CLIENT" in
 esac
 
 echo "--- 验收 ---"
-eval "$TEST_CMD" 2>&1 | tail -8
+EV="$ROOT/results/evidence/$CLIENT-$PROJECT"
+mkdir -p "$EV"
+eval "$TEST_CMD" 2>&1 | tee "$EV/pytest.txt" | tail -8
+git -C "$WORKDIR" diff HEAD > "$EV/diff.patch"
+git -C "$WORKDIR" status --porcelain > "$EV/git-status.txt"
 echo "--- diff stat ---"
 git -C "$WORKDIR" diff HEAD --stat | tail -10
+echo "evidence: $EV"
 echo "END start=$START end=$(date +%s) client=$CLIENT project=$PROJECT"

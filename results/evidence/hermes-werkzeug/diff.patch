@@ -1,0 +1,139 @@
+diff --git a/src/werkzeug/datastructures/etag.py b/src/werkzeug/datastructures/etag.py
+index cb1a6b9..9d5feca 100644
+--- a/src/werkzeug/datastructures/etag.py
++++ b/src/werkzeug/datastructures/etag.py
+@@ -9,14 +9,11 @@ if t.TYPE_CHECKING:
+ 
+ _etag_re = re.compile(
+     r"""
+-    (?:^|[ \t]*,[ \t]*)  # start or preceded by comma
++    [ \t]*  # ignore leading space
+     ([Ww]/)?  # optional weak marker
+-    (?:
+-        "([^"]*)"  # quoted value
+-    |
+-        ([^" \t,]+)  # invalid unquoted value, exclude syntax characters
+-    )
+-    (?=[ \t]*,[ \t]*|$)  # only if followed by comma or end
++    "([^"]*)"  # quoted value
++    [ \t]*  # ignore trailing space
++    (?:,|\Z)  # only if followed by comma or end
+     """,
+     flags=re.ASCII | re.VERBOSE,
+ )
+@@ -76,15 +73,23 @@ class ETags(cabc.Collection[str]):
+         from ..http import unquote_etag
+ 
+         etag, weak = unquote_etag(etag)
++
++        if etag is None:
++            return False
++
+         if weak:
+             return self.contains_weak(etag)
+         return self.contains(etag)
+ 
+     @classmethod
+     def from_header(cls, value: str | None) -> te.Self:
+-        """Parse a header value and create an instance of this class.
++        """Parse a header value and create an instance of this class. Invalid
++        items are discarded.
+ 
+         .. versionadded:: 3.2
++
++        .. versionchanged:: 3.2
++            Invalid unquoted values are discarded.
+         """
+         if not value:
+             return cls()
+@@ -94,14 +99,23 @@ class ETags(cabc.Collection[str]):
+ 
+         strong = []
+         weak = []
++        pos = 0
++
++        while True:
++            if (m := _etag_re.match(value, pos)) is None:
++                # Skip invalid chars until the next comma or end.
++                if (pos := value.find(",", pos) + 1) == 0:
++                    break
++
++                continue
+ 
+-        for match in _etag_re.finditer(value):
+-            is_weak, tag, invalid_unquoted = match.groups()
++            is_weak, tag = m.groups()
++            pos = m.end()
+ 
+             if is_weak:
+-                weak.append(tag or invalid_unquoted)
++                weak.append(tag)
+             else:
+-                strong.append(tag or invalid_unquoted)
++                strong.append(tag)
+ 
+         return cls(strong, weak)
+ 
+diff --git a/src/werkzeug/datastructures/range.py b/src/werkzeug/datastructures/range.py
+index 6a017e3..6e8127e 100644
+--- a/src/werkzeug/datastructures/range.py
++++ b/src/werkzeug/datastructures/range.py
+@@ -36,9 +36,12 @@ class IfRange:
+     @classmethod
+     def from_header(cls, value: str | None) -> te.Self:
+         """Parse an ``If-Range`` header value and create an instance of this
+-        class. A weak ETag value is discarded.
++        class. A weak or invalid ETag value is discarded.
+ 
+         .. versionadded:: 3.2
++
++        .. versionchanged:: 3.2
++            An invalid ETag value is discarded.
+         """
+         if not value:
+             return cls()
+@@ -46,12 +49,12 @@ class IfRange:
+         if (date := parse_date(value)) is not None:
+             return cls(date=date)
+ 
+-        value, weak = unquote_etag(value)
++        etag, weak = unquote_etag(value)
+ 
+-        if weak:
++        if weak or etag is None:
+             return cls()
+ 
+-        return cls(etag=value)
++        return cls(etag=etag)
+ 
+     def to_header(self) -> str:
+         """Convert to an ``If-Range`` header value."""
+diff --git a/src/werkzeug/http.py b/src/werkzeug/http.py
+index 21e67a4..6966b83 100644
+--- a/src/werkzeug/http.py
++++ b/src/werkzeug/http.py
+@@ -1046,8 +1046,13 @@ def unquote_etag(
+     >>> unquote_etag('"bar"')
+     ('bar', False)
+ 
++    An invalid value that is not quoted returns ``(None, None)``.
++
+     :param etag: the etag identifier to unquote.
+     :return: a ``(etag, weak)`` tuple.
++
++    .. versionchanged:: 3.2
++        Invalid unquoted values return ``(None, None)``.
+     """
+     if not etag:
+         return None, None
+@@ -1062,8 +1067,8 @@ def unquote_etag(
+     if etag.startswith('"', start) and etag.endswith('"', start):
+         return etag[start + 1 : -1], weak
+ 
+-    # invalid unquoted
+-    return etag[start:], weak
++    # invalid, the value must be quoted
++    return None, None
+ 
+ 
+ def _parse_etags(value: str | None) -> ds.ETags:
