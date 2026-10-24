@@ -1,0 +1,273 @@
+{
+  "client": "pi",
+  "project": "werkzeug",
+  "session_file": "2026-10-24T06-27-36-560Z_01a16c97-e5f0-76b0-bb6b-7466393c1cb5.jsonl",
+  "calls": [
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 14186,
+        "output": 235,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 13,
+        "totalTokens": 14421,
+        "cost": {
+          "input": 0.0021279,
+          "output": 0.00014099999999999998,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0022689
+        }
+      },
+      "timestamp": 1792823259574
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 1303,
+        "output": 269,
+        "cacheRead": 14080,
+        "cacheWrite": 0,
+        "reasoning": 37,
+        "totalTokens": 15652,
+        "cost": {
+          "input": 0.00019544999999999998,
+          "output": 0.0001614,
+          "cacheRead": 4.224e-05,
+          "cacheWrite": 0,
+          "total": 0.00039908999999999995
+        }
+      },
+      "timestamp": 1792823264265
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 1952,
+        "output": 277,
+        "cacheRead": 15360,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 17589,
+        "cost": {
+          "input": 0.00029279999999999996,
+          "output": 0.0001662,
+          "cacheRead": 4.608e-05,
+          "cacheWrite": 0,
+          "total": 0.00050508
+        }
+      },
+      "timestamp": 1792823268121
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2627,
+        "output": 281,
+        "cacheRead": 17280,
+        "cacheWrite": 0,
+        "reasoning": 71,
+        "totalTokens": 20188,
+        "cost": {
+          "input": 0.00039404999999999996,
+          "output": 0.0001686,
+          "cacheRead": 5.184e-05,
+          "cacheWrite": 0,
+          "total": 0.00061449
+        }
+      },
+      "timestamp": 1792823270826
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2722,
+        "output": 360,
+        "cacheRead": 19840,
+        "cacheWrite": 0,
+        "reasoning": 114,
+        "totalTokens": 22922,
+        "cost": {
+          "input": 0.0004083,
+          "output": 0.000216,
+          "cacheRead": 5.952e-05,
+          "cacheWrite": 0,
+          "total": 0.0006838199999999999
+        }
+      },
+      "timestamp": 1792823274823
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 3627,
+        "output": 562,
+        "cacheRead": 22528,
+        "cacheWrite": 0,
+        "reasoning": 257,
+        "totalTokens": 26717,
+        "cost": {
+          "input": 0.00054405,
+          "output": 0.0003372,
+          "cacheRead": 6.7584e-05,
+          "cacheWrite": 0,
+          "total": 0.0009488340000000001
+        }
+      },
+      "timestamp": 1792823278766
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2983,
+        "output": 324,
+        "cacheRead": 26112,
+        "cacheWrite": 0,
+        "reasoning": 63,
+        "totalTokens": 29419,
+        "cost": {
+          "input": 0.00044744999999999995,
+          "output": 0.00019439999999999998,
+          "cacheRead": 7.8336e-05,
+          "cacheWrite": 0,
+          "total": 0.0007201859999999999
+        }
+      },
+      "timestamp": 1792823284398
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2225,
+        "output": 408,
+        "cacheRead": 29056,
+        "cacheWrite": 0,
+        "reasoning": 111,
+        "totalTokens": 31689,
+        "cost": {
+          "input": 0.00033375,
+          "output": 0.0002448,
+          "cacheRead": 8.7168e-05,
+          "cacheWrite": 0,
+          "total": 0.0006657179999999999
+        }
+      },
+      "timestamp": 1792823289364
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 3564,
+        "output": 402,
+        "cacheRead": 31232,
+        "cacheWrite": 0,
+        "reasoning": 141,
+        "totalTokens": 35198,
+        "cost": {
+          "input": 0.0005346,
+          "output": 0.00024119999999999998,
+          "cacheRead": 9.3696e-05,
+          "cacheWrite": 0,
+          "total": 0.000869496
+        }
+      },
+      "timestamp": 1792823294433
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2154,
+        "output": 175,
+        "cacheRead": 34688,
+        "cacheWrite": 0,
+        "reasoning": 34,
+        "totalTokens": 37017,
+        "cost": {
+          "input": 0.0003231,
+          "output": 0.00010499999999999999,
+          "cacheRead": 0.000104064,
+          "cacheWrite": 0,
+          "total": 0.000532164
+        }
+      },
+      "timestamp": 1792823298710
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2723,
+        "output": 253,
+        "cacheRead": 36736,
+        "cacheWrite": 0,
+        "reasoning": 151,
+        "totalTokens": 39712,
+        "cost": {
+          "input": 0.00040845,
+          "output": 0.0001518,
+          "cacheRead": 0.000110208,
+          "cacheWrite": 0,
+          "total": 0.000670458
+        }
+      },
+      "timestamp": 1792823303650
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 715,
+        "output": 1830,
+        "cacheRead": 39424,
+        "cacheWrite": 0,
+        "reasoning": 50,
+        "totalTokens": 41969,
+        "cost": {
+          "input": 0.00010724999999999999,
+          "output": 0.001098,
+          "cacheRead": 0.000118272,
+          "cacheWrite": 0,
+          "total": 0.001323522
+        }
+      },
+      "timestamp": 1792823307956
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 2053,
+        "output": 161,
+        "cacheRead": 40064,
+        "cacheWrite": 0,
+        "reasoning": 21,
+        "totalTokens": 42278,
+        "cost": {
+          "input": 0.00030795,
+          "output": 9.659999999999999e-05,
+          "cacheRead": 0.000120192,
+          "cacheWrite": 0,
+          "total": 0.0005247419999999999
+        }
+      },
+      "timestamp": 1792823316841
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "usage": {
+        "input": 275,
+        "output": 233,
+        "cacheRead": 42112,
+        "cacheWrite": 0,
+        "reasoning": 77,
+        "totalTokens": 42620,
+        "cost": {
+          "input": 4.125e-05,
+          "output": 0.00013979999999999998,
+          "cacheRead": 0.000126336,
+          "cacheWrite": 0,
+          "total": 0.000307386
+        }
+      },
+      "timestamp": 1792823321108
+    }
+  ]
+}

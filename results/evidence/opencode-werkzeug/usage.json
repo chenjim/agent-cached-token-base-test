@@ -1,0 +1,23 @@
+{
+  "client": "opencode",
+  "project": "werkzeug",
+  "session": "ses_e93692f86ffeCAMqhNeKgRcd8d",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash",
+  "variant": "max",
+  "cost": 0.010345014,
+  "tokens": {
+    "input": 35557,
+    "output": 4414,
+    "reasoning": 2021,
+    "cache": {
+      "read": 383488,
+      "write": 0
+    }
+  },
+  "time": {
+    "created": 1792823185556,
+    "updated": 1792823252208,
+    "idle": 1792823252211
+  }
+}

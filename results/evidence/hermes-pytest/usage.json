@@ -1,0 +1,31 @@
+{
+  "client": "hermes",
+  "project": "pytest",
+  "session": "local-476f9037c23d163d28c3a53d9d81b691ca62a57dc2861853c8b780acac652b25",
+  "models": [
+    {
+      "model": "mimo-v2.6-flash",
+      "api_calls": 1,
+      "input": 245,
+      "output": 11,
+      "reasoning": 0,
+      "cache_read": 192,
+      "cache_write": 0,
+      "estimated_cost": 0.0,
+      "actual_cost": 0.0,
+      "cost_status": null
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "api_calls": 25,
+      "input": 91531,
+      "output": 13139,
+      "reasoning": 8202,
+      "cache_read": 927232,
+      "cache_write": 0,
+      "estimated_cost": 0.0,
+      "actual_cost": 0.0,
+      "cost_status": "unknown"
+    }
+  ]
+}

@@ -18,3 +18,8 @@
 
 opencode 回溯：`cd work/opencode-<project> && opencode session export <id>`
 Hermes 回溯：`sqlite3 ~/.hermes/state.db "select * from session_model_usage where session_id='<id>'"`
+
+## token 消耗存档
+- `usage.json`：该次运行的原始 usage（opencode 为 session 汇总；Hermes 按模型分列含辅助调用；pi 为逐次调用列表）
+- 汇总口径见 `results/tasks.csv`（各端所有模型调用合计）
+- baseline 汇总见 `results/baseline-hi.csv`
