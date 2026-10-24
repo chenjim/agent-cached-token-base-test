@@ -1,0 +1,72 @@
+diff --git a/src/_pytest/junitxml.py b/src/_pytest/junitxml.py
+index 06bb9fd..deb68dd 100644
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -69,6 +69,47 @@ def bin_xml_escape(arg: object) -> str:
+     return re.sub(illegal_xml_re, repl, str(arg))
+ 
+ 
++def shorten_message(message: str, budget: int = 500) -> str:
++    """Shorten a JUnit ``message`` attribute to roughly ``budget`` characters.
++
++    Some XML parsers reject very long attribute values, so the message is cut
++    on a line boundary when possible (or in the middle of the first line as a
++    last resort) and a marker pointing at the element text is appended. The
++    full report is still available as the element text.
++
++    Shortening must happen *before* escaping, otherwise an escape sequence
++    such as ``#x1B`` could be cut in half.
++    """
++    if len(message) <= budget:
++        return message
++
++    lines = message.splitlines()
++    kept: list[str] = []
++    used = 0
++    for line in lines:
++        # +1 for the newline separating it from the previous kept line.
++        cost = len(line) + (1 if kept else 0)
++        if used + cost > budget:
++            break
++        kept.append(line)
++        used += cost
++
++    if not kept:
++        # The very first line alone is longer than the budget: cut it.
++        text = lines[0][:budget] + "..."
++        remaining = len(lines) - 1
++    else:
++        text = "\n".join(kept)
++        remaining = len(lines) - len(kept)
++
++    if remaining:
++        noun = "line" if remaining == 1 else "lines"
++        marker = f"[+{remaining} more {noun}; full report in element text]"
++    else:
++        marker = "[truncated; full report in element text]"
++    return f"{text}\n{marker}"
++
++
+ def merge_family(left, right) -> None:
+     result = {}
+     for kl, vl in left.items():
+@@ -213,7 +254,7 @@ class _NodeReporter:
+                 message = reprcrash.message
+             else:
+                 message = str(report.longrepr)
+-            message = bin_xml_escape(message)
++            message = bin_xml_escape(shorten_message(message))
+             self._add_simple("failure", message, str(report.longrepr))
+ 
+     def append_collect_error(self, report: CollectReport) -> None:
+@@ -236,7 +277,9 @@ class _NodeReporter:
+             msg = f'failed on teardown with "{reason}"'
+         else:
+             msg = f'failed on setup with "{reason}"'
+-        self._add_simple("error", bin_xml_escape(msg), str(report.longrepr))
++        self._add_simple(
++            "error", bin_xml_escape(shorten_message(msg)), str(report.longrepr)
++        )
+ 
+     def append_skipped(self, report: TestReport) -> None:
+         if hasattr(report, "wasxfail"):

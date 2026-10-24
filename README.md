@@ -6,7 +6,7 @@
 有个问题一直没答案：**同一个模型，换个壳子，token 到底差多少？**
 
 账单上看不出——三端都算在同一个订阅里。缓存命中率更是各家自说自话。
-于是我干脆搭了个测试台，用真实的开源 bug 跑一遍。
+于是我干脆搭了个测试台，用真实的开源 bug 跑三遍。
 
 仓库：[github.com/chenjim/agent-cached-token-base-test](https://github.com/chenjim/agent-cached-token-base-test)
 
@@ -81,23 +81,25 @@ $ git checkout 5b0dc6d6 -- src/werkzeug/datastructures/etag.py ...
 这不是模型的错，是我的测试台漏了。把 `.git` 整个重置成单一 commit 之后，
 同一道题 opencode 用了 72 秒，改法也和官方不同——这才是我想要的。
 
-顺带一提，三端的修法确实不一样：opencode 和 pi 改 `sansio/http.py`，
-Hermes 绕去了 `datastructures/range.py`。同一个 bug，三种合法解法。
+顺带一提，三端的修法确实不一样：opencode 和 pi 常改 `sansio/http.py`，
+Hermes 会绕去 `datastructures/range.py`。同一个 bug，多种合法解法。
 
 ## 数据
 
-两轮，每轮 6 次运行，共 12 次，全部通过目标测试，没有人动过测试文件。
+三轮，每轮 6 次运行，共 18 次，全部通过目标测试，没有人动过测试文件。
 
-![两轮平均总 token](docs/figures/01-tokens.png)
+![三轮平均总 token](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-01-tokens.png-blog)
 
-| 项目 | 客户端 | 总 token（均值） | 命中率（两轮） | 成本/次 | 耗时 |
-|---|---|---:|---|---:|---|
-| werkzeug | opencode | 378K | 91.5% / 81.3% | $0.0119 | 52s / 72s |
-| werkzeug | pi | 571K | 89.5% / 94.1% | $0.0110 | 69s / 222s |
-| werkzeug | hermes | 1733K | 94.2% / 92.0% | $0.0380 | 567s / 702s |
-| pytest | opencode | 293K | 90.8% / 83.7% | $0.0093 | 76s / 128s |
-| pytest | pi | 276K | 89.9% / 87.7% | $0.0081 | 68s / 112s |
-| pytest | hermes | 828K | 91.0% / 92.4% | $0.0233 | 168s / 104s |
+| 项目 | 客户端 | 第 1 轮 | 第 2 轮 | 第 3 轮 | 中位数 | 成本/次（均值） | 命中率（均值） |
+|---|---|---:|---:|---:|---:|---:|---:|
+| werkzeug | opencode | 425K | 331K | 1049K | **425K** | $0.0129 | 89.5% |
+| werkzeug | pi | 419K | 724K | 568K | **568K** | $0.0127 | 90.7% |
+| werkzeug | hermes | 1670K | 1796K | 771K | **1670K** | $0.0310 | 93.3% |
+| pytest | opencode | 266K | 320K | 502K | **320K** | $0.0098 | 89.7% |
+| pytest | pi | 270K | 282K | 390K | **282K** | $0.0095 | 90.5% |
+| pytest | hermes | 1040K | 615K | 367K | **615K** | $0.0197 | 91.2% |
+
+均值会被离群值带偏（第三轮 opencode 在 werkzeug 上飙到 1049K），所以结论按**中位数**看。
 
 口径：
 
@@ -113,36 +115,49 @@ Hermes 本地不记成本（`actual_cost_usd` 恒为 0），表里是按 opencod
 
 ## 缓存命中：真的差不多
 
-![缓存命中率](docs/figures/02-cache-hit.png)
+![缓存命中率](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-02-cache-hit.png-blog)
 
-三端都在 86%–93% 之间。Hermes 略高，因为它 system prompt 更长、前缀更稳定——
+三轮均值都在 89%–93% 之间，三个客户端的差距**小于各自的波动范围**——
+换句话说：缓存命中率不是这三者的差异来源，谁也没比别人省。
+
+Hermes 略高（93.3%），因为它 system prompt 更长、前缀更稳定，
 长前缀反而更容易吃到缓存，这点反直觉但合理。
 
-opencode 波动最大（81%–91%），我怀疑跟会话重建时机有关，还没深挖。
+opencode 波动最大（81%–95%），跟会话重建时机有关，还没深挖。
 
 ## 成本差距才是重点
 
-![单次成本](docs/figures/03-cost.png)
+![单次成本](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-03-cost.png-blog)
 
-Hermes 的单次成本是 opencode 的 2.5–4.5 倍，主要是三个原因叠加：
+三轮均值看，Hermes 在 werkzeug 上是 opencode 的 2.4 倍、pytest 上 2.0 倍。
+原因三个叠加：
 
-1. system prompt 明显更长（规则、记忆、技能清单都塞进去）
-2. 轮次更多：werkzeug 那道题 pi 跑 14–25 次调用、Hermes 跑 32–34 次
+1. system prompt 明显更长（规则、记忆、技能清单全塞进去）
+2. 轮次更多：pytest 那道题 pi 跑 11–14 次调用、Hermes 跑 11–25 次
 3. 每轮都要重新带上完整上下文
 
-反过来 pi 却意外地便宜——总 token 和 opencode 接近，成本还低一截。
-它的 `cost` 字段不含 reasoning 单独计价，所以跨端比较我用的是按单价重算的 `estimated_cost`。
+有意思的是第三轮 Hermes 突然变便宜了（pytest 只花 $0.0127，比第一轮低 57%）。
+它那次探索路径更短，11 次调用就收敛——同一套配置，结果能在 2.5 倍区间里晃。
+
+pi 则意外地稳：总 token 和 opencode 接近，成本还低一截。
+它的 `cost` 字段不含 reasoning 单独计价，跨端比较我用的是按单价重算的 `estimated_cost`。
 
 ## 但先别急着下结论
 
-![两轮方差](docs/figures/04-variance.png)
+![三轮方差](https://blog-chenjim.oss-cn-shanghai.aliyuncs.com/2026/261024-agent-token-bench-04-variance.png-blog)
 
-这是我最想强调的一张图：**同一配置、同一个任务，两轮之间能差 1–2 倍。**
+这是我最想强调的一张图：**同一配置、同一个任务，三轮之间最大差 2.5 倍。**
 
-pi 在 werkzeug 上从 418K 跳到 724K，Hermes 在 pytest 上从 1040K 降到 615K。
-模型的探索路径是随机的，多走两步、多读两个文件，token 就上去了。
+- Hermes 在 werkzeug 上：1670K → 1796K → 771K
+- opencode 在 pytest 上：266K → 320K → 502K
+- pi 相对稳，但也有 1.7 倍波动
 
-所以两轮不够。正确做法是 3–5 轮取中位数，我在脚本里留了 `ROUND` 参数：
+模型的探索路径是随机的，多走两步、多读两个文件、多跑一次全量测试，token 就上去了。
+
+我最初拿前两轮的数据得出"Hermes 是 opencode 的 3.9 倍"，补了第三轮之后，
+这个倍数变成 1.9–3.9 倍不等——**任何单轮结论都不该当定论。**
+
+脚本里留了 `ROUND` 参数，想跑几轮都行：
 
 ```bash
 ROUND=3 ./run/run_task.sh pi werkzeug
@@ -167,18 +182,19 @@ sqlite3 ~/.hermes/state.db \
 `collect/collect.py` 会把三边整理成同一套字段，并补上 `estimated_cost`。
 
 有个坑值得记一下：**opencode 的 `api_calls` 恒为 1**。那是 session 汇总字段，
-不是真实请求数。我一开始拿它和 pi 的 25 次、Hermes 的 34 次并排比，结论完全是错的。
+不是真实请求数。我一开始拿它和 pi 的 14 次、Hermes 的 32 次并排比，结论完全是错的。
 
 ## 目前能说的结论
 
-- **缓存命中率不是差异来源**，三端都在 90% 上下
-- **总 token 差异主要来自 context 设计**：Hermes 是 opencode 的 2–4.6 倍
-- **成本排序在 pytest 上稳定**：pi < opencode < hermes
-- **方差比差异更大**，单轮数据只能算参考
+- **缓存命中率不是差异来源**：三端 89%–93%，差距小于波动范围
+- **总 token 差异主要来自 context 设计**：按中位数，Hermes 是 opencode 的 1.9–3.9 倍
+- **成本排序稳定**：pi ≈ opencode < hermes，两个项目都成立
+- **方差比差异更大**：同一配置三轮晃 2.5 倍，单轮数据只能算参考
+- **想省钱，先改 context 设计（规则/记忆/工具），不是换客户端**
 
 ## 还没做完的
 
-- 轮次不够，应该跑到 5 轮取中位数
+- 三轮还是偏少，5 轮更稳
 - werkzeug 那题只有 45 行改动，偏简单，该换更复杂的
 - pytest 的测试 patch 里 import 了 `shorten_message`，等于把函数名告诉了模型，
   比 werkzeug 那题多了提示，两题难度不完全对等

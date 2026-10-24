@@ -1,0 +1,30 @@
+{
+  "client": "hermes",
+  "project": "pytest",
+  "round": 3,
+  "session": "local-e719acacc9c002bc70cad12ccfd3291063e411a5d399a8f428cf1c8e4a4558c2",
+  "models": [
+    {
+      "model": "mimo-v2.6-flash",
+      "task": "title_generation",
+      "api_calls": 1,
+      "input": 437,
+      "output": 12,
+      "reasoning": 0,
+      "cache_read": 0,
+      "cache_write": 0,
+      "actual_cost": 0.0
+    },
+    {
+      "model": "deepseek-v4.1-flash",
+      "task": "",
+      "api_calls": 11,
+      "input": 35230,
+      "output": 6555,
+      "reasoning": 4163,
+      "cache_read": 320640,
+      "cache_write": 0,
+      "actual_cost": 0.0
+    }
+  ]
+}
